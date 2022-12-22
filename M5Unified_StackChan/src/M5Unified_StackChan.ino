@@ -33,6 +33,8 @@ static AudioOutputM5Speaker out(&M5.Speaker, m5spk_virtual_channel);
 static AudioGeneratorWAV wav;
 static AudioFileSourceSD *file = nullptr;
 static AudioFileSourceBuffer *buff = nullptr;
+const int preallocateBufferSize = 5*1024;
+uint8_t *preallocateBuffer;
 
 using namespace m5avatar;
 Avatar avatar;
@@ -54,13 +56,14 @@ void play(const char* fname)
   Serial.printf("play file fname = %s\r\n", fname);
   if (file != nullptr) { stop(); }
   file = new AudioFileSourceSD(fname);
-  buff = new AudioFileSourceBuffer(file,2048);
+  buff = new AudioFileSourceBuffer(file, preallocateBuffer, preallocateBufferSize);
 //  wav.begin(file, &out);
   wav.begin(buff, &out);
   delay(10);
   while (wav.isRunning())
   {
-    while(wav.loop()) {delay(1);}
+//    while(wav.loop()) {delay(1);}
+    while(wav.loop()) {}
       wav.stop(); 
       file->close();
       delete file;
@@ -154,7 +157,6 @@ static void speachTask(void*)
       data_index = random(0, fileCount);
       Serial.printf("data_index = %d fileCount = %d \r\n", data_index, fileCount);
       if(data_index < fileCount){
-        // avatar.setSpeechText("");
         avatar.setExpression(Expression::Happy);
         // Serial.printf("data_index-data_num = %d\r\n", data_index-data_num);
         play(fileList[data_index].c_str());
@@ -233,15 +235,22 @@ void setup() {
 
   M5.begin(cfg);
 
+  preallocateBuffer = (uint8_t *)malloc(preallocateBufferSize);
+  if (!preallocateBuffer) {
+    M5.Display.printf("FATAL ERROR:  Unable to preallocate %d bytes for app\n", preallocateBufferSize);
+    for (;;) { delay(1000); }
+  }
+
   { /// custom setting
     auto spk_cfg = M5.Speaker.config();
     /// Increasing the sample_rate will improve the sound quality instead of increasing the CPU load.
-    spk_cfg.sample_rate = 96000; // default:64000 (64kHz)  e.g. 48000 , 50000 , 80000 , 96000 , 100000 , 128000 , 144000 , 192000 , 200000
+//    spk_cfg.sample_rate = 96000; // default:64000 (64kHz)  e.g. 48000 , 50000 , 80000 , 96000 , 100000 , 128000 , 144000 , 192000 , 200000
+    spk_cfg.sample_rate = 48000; // default:64000 (64kHz)  e.g. 48000 , 50000 , 80000 , 96000 , 100000 , 128000 , 144000 , 192000 , 200000
     //spk_cfg.task_priority = configMAX_PRIORITIES - 2;
-    // spk_cfg.task_priority = 5;
+//    spk_cfg.task_priority = 5;
     spk_cfg.dma_buf_count = 20;
     spk_cfg.dma_buf_len = 512;
-    spk_cfg.task_pinned_core = APP_CPU_NUM;
+    spk_cfg.task_pinned_core = PRO_CPU_NUM;
     M5.Speaker.config(spk_cfg);
   }
   M5.begin(cfg);
@@ -249,7 +258,7 @@ void setup() {
   M5.Lcd.clear();
   M5.Lcd.setCursor(0,0);
   M5.Lcd.setTextSize(2);
-  M5.Speaker.setChannelVolume(m5spk_virtual_channel, 200);
+  M5.Speaker.setChannelVolume(m5spk_virtual_channel, 180);
 
   Servo_setup();
   delay(1000);
@@ -259,7 +268,7 @@ void setup() {
   avatar.init();
   avatar.addTask(lipSync, "lipSync");
   avatar.addTask(servo, "servo");
-  xTaskCreatePinnedToCore(speachTask, "speachTask", 4096, nullptr, 5, nullptr, APP_CPU_NUM);
+  xTaskCreateUniversal(speachTask, "speachTask", 4096, nullptr, 8, nullptr, APP_CPU_NUM);
 }
 
 void loop() {
