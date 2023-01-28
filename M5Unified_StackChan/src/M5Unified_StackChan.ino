@@ -244,8 +244,8 @@ void setup() {
   { /// custom setting
     auto spk_cfg = M5.Speaker.config();
     /// Increasing the sample_rate will improve the sound quality instead of increasing the CPU load.
-//    spk_cfg.sample_rate = 96000; // default:64000 (64kHz)  e.g. 48000 , 50000 , 80000 , 96000 , 100000 , 128000 , 144000 , 192000 , 200000
-    spk_cfg.sample_rate = 48000; // default:64000 (64kHz)  e.g. 48000 , 50000 , 80000 , 96000 , 100000 , 128000 , 144000 , 192000 , 200000
+    spk_cfg.sample_rate = 96000; // default:64000 (64kHz)  e.g. 48000 , 50000 , 80000 , 96000 , 100000 , 128000 , 144000 , 192000 , 200000
+//    spk_cfg.sample_rate = 48000; // default:64000 (64kHz)  e.g. 48000 , 50000 , 80000 , 96000 , 100000 , 128000 , 144000 , 192000 , 200000
     //spk_cfg.task_priority = configMAX_PRIORITIES - 2;
 //    spk_cfg.task_priority = 5;
     spk_cfg.dma_buf_count = 20;
@@ -268,7 +268,7 @@ void setup() {
   avatar.init();
   avatar.addTask(lipSync, "lipSync");
   avatar.addTask(servo, "servo");
-  xTaskCreateUniversal(speachTask, "speachTask", 4096, nullptr, 8, nullptr, APP_CPU_NUM);
+  xTaskCreateUniversal(speachTask, "speachTask", 4096, nullptr, 2, nullptr, APP_CPU_NUM);
 }
 
 void loop() {
