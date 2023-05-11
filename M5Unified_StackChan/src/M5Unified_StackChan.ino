@@ -10,10 +10,10 @@
 #define USE_SERVO
 #ifdef USE_SERVO
 #if defined(ARDUINO_M5STACK_Core2)
-  #define SERVO_PIN_X 13  //Core2 PORT C
-  #define SERVO_PIN_Y 14
-//  #define SERVO_PIN_X 33  //Core2 PORT A
-//  #define SERVO_PIN_Y 32
+  // #define SERVO_PIN_X 13  //Core2 PORT C
+  // #define SERVO_PIN_Y 14
+ #define SERVO_PIN_X 33  //Core2 PORT A
+ #define SERVO_PIN_Y 32
 #elif defined( ARDUINO_M5STACK_FIRE )
   #define SERVO_PIN_X 21
   #define SERVO_PIN_Y 22

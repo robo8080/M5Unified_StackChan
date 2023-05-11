@@ -24,8 +24,14 @@ An M5Stack library for rendering avatar faces <https://github.com/meganetaaan/m5
 
 ---
 
+### サーボモーターを使用するGPIO番号の設定 ###
+* M5Unified_StackChan.inoの13行目付近、サーボモーターを使用するGPIO番号を設定してください。<br>
+
+---
+
 ### 使い方 ###
 * SDカードに、wavというディレクトリを作りそこにwavファイルを入れておきます<br>
+* wavファイルのサンプリング周波数は16khzか24khzにしてください。<br>
 * ファイル名に全角文字や長いファイル名はつかえません。<br>
 * サンプルのwavファイルがwavディレクトリに入っています。<br>
 この音声データは[「VOICEVOX;ずんだもん」](https://voicevox.hiroshiba.jp/ "Title")を使用して作成しました。<br>
